@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <%- include('../partials/head'); %>
+  <script src="https://cdn.jsdelivr.net/momentjs/2.14.1/moment.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <!-- <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script> -->
+  <!-- <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css"> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+</head>
+
+<class="navbar navbar-inverse navbar-static-top">
+  <div class="container">
+    <a class="navbar-brand" style="color: forestgreen;" href="/">Appointment</a>
+    <ul class="nav navbar-nav">
+      <li class="active">
+        <a href="/">Home</a>
+      </li>
+      <li>
+        <a href="/logout">Logout</a>
+      </li>
+      
+    </ul>
+  </div>
+</nav>
+<style>
+  body {
+    font-family: Calibri, Helvetica, sans-serif;
+    background-color: pink;
+  }
+
+  .container {
+    padding: 50px;
+    background-color: lightblue;
+  }
+
+  input[type=text],
+  input[type=password],
+  textarea {
+    width: 100%;
+    padding: 15px;
+    margin: 5px 0 22px 0;
+    display: inline-block;
+    border: none;
+    background: #f1f1f1;
+  }
+
+  input[type=text]:focus,
+  input[type=password]:focus {
+    background-color: orange;
+    outline: none;
+  }
+
+  div {
+    padding: 10px 0;
+  }
+
+  hr {
+    border: 1px solid #f1f1f1;
+    margin-bottom: 25px;
+  }
+
+  .registerbtn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 16px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    opacity: 0.9;
+  }
+
+  .registerbtn:hover {
+    opacity: 1;
+  }
+  /* select {
+    margin: 15px;
+    padding: 15px;
+    width: 40vw;
+  } */
+</style>
+
+<body>
+  <form action="/appointment" id="form" method="post" class="form-group">
+    <div class="container">
+      <center>
+        <h1> Create new Timeslots</h1>
+      </center>
+      <hr>
+      <div id="booking">  
+        <label>   
+        Set Appointment Date 
+        </label><br>  
+        <div class='input-group date' id='datepicker1'>
+            <input type='text' class="form-control" data-provide="datepicker" name="bookingDate" id="bookingDate"/>
+            <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+         </div>
+         <!-- <label>Set Time Slot</label><br>
+         <select class="form-control" name="bookingTime" id="bookingTime">
+           <option value="09:00">09:00</option>
+           <option value="11:00">11:00</option>
+           <option value="13:00">13:00</option>
+           <option value="15:00">15:00</option>
+         </select> -->
+         <script>
+             /* event listener */
+            
+
+            /* function */
+            
+              $(document).ready(function() {
+                $("#bookingDate").change(doThing);
+                
+                function doThing() {
+              
+                console.log('Doing something')
+                var date = document.getElementById("bookingDate").value;
+                var specific_date = new Date(date);
+                var current_date = new Date();
+                // if(current_date.getTime() > specific_date.getTime())
+                // {
+                //     alert('current_date date is greater than specific_date');
+                //     console.log('current_date date is grater than specific_date')
+                //     location.reload();
+                // }
+                // else
+                // {
+                //     alert('Please choose a later date');
+                //     console.log('current_date date is lower than specific_date')
+                //     location.reload();
+                // }
+                let times = ["09:00", "11:00", "13:00", "15:00"];
+                const req = new XMLHttpRequest();
+                req.open('GET', `/appointmentSlots/?date=${date}`, true);
+                req.send();
+                req.onload = function() {
+                  const json = JSON.parse(req.responseText);
+                  $("#booking").append("<label>Create Appointment Slot</label><br><div id='bookingSlots'><select class='form-control' name='bookingTime' id='slots'></select></div>");
+                  for (let i = 0; i < times.length; i++) {
+                    let notFound = true;
+                    for (let j = 0; (j < json.length) && (notFound); j++) {
+                      if (json[j].time == times[i]) {
+                        notFound = false;
+                      }
+                    }
+                    if (notFound) {
+                      $('#slots').append(`<option value='${times[i]}'>${times[i]}</option>`)
+                    }
+                  }
+                }
+              }
+              });
+         </script>
+        
+        </div>  
+
+      <button class="registerbtn">Add appointment</button>
+  </form>
+
+
+</body>
+<script src="script.js"></script>
+
+</html>
+
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script> -->
+
+<!-- <script type="text/javascript">
+  $(function () {
+    var datepicker = $.fn.datepicker.noConflict();
+    $.fn.bootstrapDP = datepicker;
+    $('#datepicker1').bootstrapDP();;
+  });
+</script> -->

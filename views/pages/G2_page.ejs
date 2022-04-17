@@ -1,0 +1,164 @@
+<!DOCTYPE html>  
+<html>  
+    <head>
+      <%- include('../partials/head'); %>
+      <script src="https://cdn.jsdelivr.net/momentjs/2.14.1/moment.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    </head>
+    
+    <header>
+        <%- include('../partials/header'); %>
+      </header> 
+<style>  
+    body{  
+      font-family: Calibri, Helvetica, sans-serif;  
+      background-color: pink;  
+    }  
+    .container {  
+        padding: 50px;  
+      background-color: lightblue;  
+    }  
+      
+    input[type=text], input[type=password], textarea {  
+      width: 100%;  
+      padding: 15px;  
+      margin: 5px 0 22px 0;  
+      display: inline-block;  
+      border: none;  
+      background: #f1f1f1;  
+    }  
+    input[type=text]:focus, input[type=password]:focus {  
+      background-color: orange;  
+      outline: none;  
+    }  
+     div {  
+                padding: 10px 0;  
+             }  
+    hr {  
+      border: 1px solid #f1f1f1;  
+      margin-bottom: 25px;  
+    }  
+    .registerbtn {  
+      background-color: #4CAF50;  
+      color: white;  
+      padding: 16px 20px;  
+      margin: 8px 0;  
+      border: none;  
+      cursor: pointer;  
+      width: 100%;  
+      opacity: 0.9;  
+    }  
+    .registerbtn:hover {  
+      opacity: 1;  
+    }
+    #bookingSlots {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }  
+    </style> 
+     
+<body>  
+<form action="/userdatarefinery" class="form-group" method="post">
+  <div class="container">  
+  <center>  <h1> Registeration Form</h1> </center>  
+  <hr>  
+  <label> Firstname </label>   
+<input type="text" name="firstName" placeholder= "Firstname" size="15" required />
+<label> Lastname: </label>    
+<input type="text" name="lastName" placeholder="Lastname" size="15"required />
+<div>  
+<label>   
+User Id :  
+</label>   
+<input type="text" name="userId" placeholder="UserId" size="15"required /> 
+</div>  
+<div>  
+<label>   
+Date Of Birth:  
+</label><br>  
+<div class='input-group date' id='datepicker1'>
+    <input type='text' class="form-control" data-provide="datepicker" name="DOB"/>
+    <span class="input-group-addon">
+    <span class="glyphicon glyphicon-calendar"></span>
+    </span>
+ </div>
+
+</div>  
+<label>
+    Current Address : 
+</label>  
+<textarea name="address" cols="80" rows="5" placeholder="Current Address" value="address" required>
+</textarea> 
+
+<label>
+    Car Details : 
+</label>  
+<textarea name="carDetails" cols="80" rows="5" placeholder="Car Details" value="ie make, model, year, plat number" required>
+</textarea> 
+  
+<label>   
+    Licence Number :  
+</label>  
+<input type="text" name="licence" placeholder="Licence"  value=" " size="2"/>
+<div id="booking">
+<label>   
+  Set Appointment Date 
+</label><br>  
+<div class='input-group date' id='datepicker2'>
+  <input type='text' class="form-control" data-provide="datepicker" name="bookingDate" id="bookingDate"/>
+  <span class="input-group-addon">
+    <span class="glyphicon glyphicon-calendar"></span>
+  </span>
+</div>
+</div>
+
+
+    
+<button type="submit" id="registerbtn" class="registerbtn btn btn-secondary" disabled>Register</button>    
+</form>  
+</body>  
+</html>
+<script>
+  /* event listener */
+  $(document).ready(function() {
+    $("#bookingDate").change(doThing);
+    
+    function doThing() {
+      var date = document.getElementById("bookingDate").value;
+      var specific_date = new Date(date);
+      var current_date = new Date();
+    //  if(current_date.getTime() > specific_date.getTime())
+    //  {
+    //      alert('current_date date is greater than specific_date');
+    //      console.log('current_date date is grater than specific_date')
+    //      location.reload();
+    //  }
+    //  else
+    //  {
+    //      alert('Please choose a later date');
+    //      console.log('current_date date is lower than specific_date')
+    //      location.reload();
+    //  }
+      const req = new XMLHttpRequest();
+      req.open('GET', `/slots?date=${date}`, true);
+      req.send();
+      req.onload = function() {
+        const json = JSON.parse(req.responseText);
+        if (json.length > 0) {
+          $("#booking").append("<label>Set Appointment Time</label><br><div id='bookingSlots'><select name='bookingTime' class='form-control' id='slots'></select></div>");
+          for (let i = 0; i < json.length; i++) {
+            $('#slots').append(`<option value='${json[i].time}'>${json[i].time}</option>`)
+            $('#registerbtn').removeAttr('disabled');
+          }
+        } else {
+          $("#booking").append("<label>No appointment slots available. Contact admin</label>");
+          $("#registerbtn").attr("disabled", "disabled");
+        }
+      }
+    }
+  });
+</script>
